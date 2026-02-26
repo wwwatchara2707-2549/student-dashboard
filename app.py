@@ -10,3 +10,7 @@ app.layout = html.Div([
 
 if __name__ == '__main__':
     app.run(debug=True)
+app.layout = html.Div([
+    html.H1("Student Performance Dashboard"),
+    html.P("Day 1 Setup Successful")
+], style={"textAlign": "center", "marginTop": "50px"})
