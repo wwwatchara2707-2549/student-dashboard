@@ -254,25 +254,29 @@ def reset_filters(n):
 # ===============================
 @app.callback(
     Output("download-data", "data"),
+    Output("total-students", "children"),
     Input("download-button", "n_clicks"),
     Input("major-dropdown", "value"),
     Input("gpa-slider", "value"),
     prevent_initial_call=True
 )
 def download_filtered_data(n, major, gpa_range):
-    
+
     if not n:
-        return dash.no_update
+        return dash.no_update, dash.no_update
 
     filtered_df = filter_data(major, gpa_range)
 
     if filtered_df.empty:
-        return dash.no_update
+        return dash.no_update, "⚠ No data available to download"
 
-    return dcc.send_data_frame(
-        filtered_df.to_csv,
-        "filtered_students.csv",
-        index=False
+    return (
+        dcc.send_data_frame(
+            filtered_df.to_csv,
+            "filtered_students.csv",
+            index=False
+        ),
+        f"📁 Downloaded {len(filtered_df)} records"
     )
 
 # ===============================
