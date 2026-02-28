@@ -25,6 +25,14 @@ import plotly.express as px
 # Load dataset
 df = pd.read_csv("data.csv")
 
+# Helper function to filter dataframe
+def filter_data(selected_major, gpa_range):
+    return df[
+        (df["Major"] == selected_major) &
+        (df["GPA"] >= gpa_range[0]) &
+        (df["GPA"] <= gpa_range[1])
+    ]
+
 # Initialize Dash app
 app = dash.Dash(__name__)
 
@@ -143,11 +151,7 @@ app.layout = html.Div([
 )
 def update_graphs(selected_major, gpa_range):
 
-    filtered_df = df[
-        (df["Major"] == selected_major) &
-        (df["GPA"] >= gpa_range[0]) &
-        (df["GPA"] <= gpa_range[1])
-    ]
+    filtered_df = filter_data(selected_major, gpa_range)
 
     fig1 = px.bar(filtered_df, x="Name", y="Math", title="Math Scores")
     fig2 = px.line(filtered_df, x="Age", y="GPA",
@@ -201,11 +205,7 @@ def reset_filters(n_clicks):
 )
 def download_filtered_data(n_clicks, selected_major, gpa_range):
 
-    filtered_df = df[
-        (df["Major"] == selected_major) &
-        (df["GPA"] >= gpa_range[0]) &
-        (df["GPA"] <= gpa_range[1])
-    ]
+    filtered_df = filter_data(selected_major, gpa_range)
 
     return dcc.send_data_frame(
         filtered_df.to_csv,
