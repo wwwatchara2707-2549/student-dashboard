@@ -15,3 +15,48 @@ body {
     background-color: #f5f7fa;
     font-family: Arial, sans-serif;
 }
+/* กล่อง dropdown */
+.custom-dropdown > div {
+    background-color: white !important;
+    color: black !important;
+}
+
+/* ข้อความที่ถูกเลือก (เช่น IT) */
+.custom-dropdown div[class*="singleValue"] {
+    color: black !important;
+}
+
+/* เมนูที่เด้งลงมา */
+.custom-dropdown div[class*="menu"] {
+    background-color: white !important;
+}
+
+/* ตัวเลือกในเมนู */
+.custom-dropdown div[class*="option"] {
+    color: black !important;
+}
+
+.rc-slider-mark-text {
+    color: white !important;     
+    font-weight: bold;
+    font-size: 14px;
+}
+.rc-slider-track {
+    background-color: #a855f7 !important;  
+}
+
+.rc-slider-handle {
+    border: solid 2px white !important;
+}
+.rc-slider-mark-text {
+    color: #00d4ff !important;
+    font-weight: bold;
+    font-size: 14px;
+}
+.rc-slider-mark-text-active {
+    color: #00d4ff !important;
+    font-weight: bold;
+}
+div[class*="singleValue"] {
+    color: black !important;
+}

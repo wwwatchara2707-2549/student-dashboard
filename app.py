@@ -69,22 +69,37 @@ app.layout = html.Div([
 
         html.Label("Select Major"),
         dcc.Dropdown(
-            id="major-dropdown",
-            options=[{"label": m, "value": m} for m in df["Major"].unique()],
-            value=df["Major"].unique()[0],
-            clearable=False,
-            style={"marginBottom": "20px"}
-        ),
+    id="major-dropdown",
+    options=[
+        {"label": m, "value": m} 
+        for m in df["Major"].unique()
+    ],
+    value=df["Major"].unique()[0],
+    clearable=False,
+    className="custom-dropdown",
+    style={
+        "marginBottom": "20px",
+        "backgroundColor": "white",
+        "color": "black"
+    },
+    optionHeight=35
+),
 
         html.Label("Select GPA Range"),
         dcc.RangeSlider(
-            id="gpa-slider",
-            min=df["GPA"].min(),
-            max=df["GPA"].max(),
-            step=0.1,
-            value=[df["GPA"].min(), df["GPA"].max()],
-            marks={round(g,1): str(round(g,1)) for g in sorted(df["GPA"].unique())}
-        ),
+    id="gpa-slider",
+    min=2.9,
+    max=3.9,
+    step=0.1,
+    value=[2.9, 3.9],
+    marks={
+        round(i,1): {
+            "label": str(round(i,1)),
+            "style": {"color": "white", "fontWeight": "bold"}
+        }
+        for i in [x/10 for x in range(29, 40)]
+    }
+),
 
     ], style={
         "backgroundColor": "#1e293b",
