@@ -49,6 +49,21 @@ app.layout = html.Div([
         value=[df["GPA"].min(), df["GPA"].max()],
         marks={round(g, 1): str(round(g, 1)) for g in sorted(df["GPA"].unique())}
     ),
+    
+    # Reset Button
+    html.Button(
+        "Reset Filters",
+        id="reset-button",
+        n_clicks=0,
+        style={
+            "marginTop": "15px",
+            "padding": "10px 20px",
+            "backgroundColor": "#ff4d4f",
+            "color": "white",
+            "border": "none",
+            "cursor": "pointer"
+        }
+    ),
 
     # KPI Cards
     html.Div([
@@ -81,8 +96,7 @@ app.layout = html.Div([
 
 ], style={"margin": "40px"})
 
-
-# Callback
+# Main Callback
 @app.callback(
     Output("bar-chart", "figure"),
     Output("line-chart", "figure"),
@@ -104,54 +118,45 @@ def update_graphs(selected_major, gpa_range):
     ]
 
     # Bar chart
-    fig1 = px.bar(
-        filtered_df,
-        x="Name",
-        y="Math",
-        title="Math Scores"
-    )
+    fig1 = px.bar(filtered_df, x="Name", y="Math", title="Math Scores")
 
     # Line chart
-    fig2 = px.line(
-        filtered_df,
-        x="Age",
-        y="GPA",
-        title="GPA by Age",
-        markers=True
-    )
+    fig2 = px.line(filtered_df, x="Age", y="GPA",
+                   title="GPA by Age", markers=True)
 
     # Pie chart
     pie_df = df[
         (df["GPA"] >= gpa_range[0]) &
         (df["GPA"] <= gpa_range[1])
     ]
-
-    fig3 = px.pie(
-        pie_df,
-        names="Major",
-        title="Major Distribution"
-    )
+    fig3 = px.pie(pie_df, names="Major",
+                  title="Major Distribution")
 
     # Scatter plot
-    fig4 = px.scatter(
-        filtered_df,
-        x="Math",
-        y="GPA",
-        size="Age",
-        title="Math vs GPA (size = Age)",
-        hover_data=["Name"]
-    )
+    fig4 = px.scatter(filtered_df, x="Math", y="GPA",
+                      size="Age",
+                      title="Math vs GPA (size = Age)",
+                      hover_data=["Name"])
 
     # KPI values
     total_students = f"👨‍🎓 Total Students: {len(filtered_df)}"
     avg_gpa = f"📊 Average GPA: {round(filtered_df['GPA'].mean(), 2) if not filtered_df.empty else 0}"
     max_gpa = f"🏆 Highest GPA: {filtered_df['GPA'].max() if not filtered_df.empty else 0}"
 
-    # Table data
     table_data = filtered_df.to_dict("records")
 
     return fig1, fig2, fig3, fig4, total_students, avg_gpa, max_gpa, table_data
 
+
+# Reset Callback (ต้องอยู่แยก และมี def ต่อทันที)
+@app.callback(
+    Output("major-dropdown", "value"),
+    Output("gpa-slider", "value"),
+    Input("reset-button", "n_clicks"),
+    prevent_initial_call=True
+)
+def reset_filters(n_clicks):
+    return df["Major"].unique()[0], [df["GPA"].min(), df["GPA"].max()]
 
 if __name__ == '__main__':
     app.run(debug=True)
