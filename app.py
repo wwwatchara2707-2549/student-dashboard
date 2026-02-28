@@ -53,14 +53,26 @@ app.layout = html.Div([
             style={"textAlign": "center"}),
 
     # ---------------------------
-    # Filters
-    # ---------------------------
+# Filter Card
+# ---------------------------
+html.Div([
+
+    html.H3("🔎 Filter Students",
+            style={"marginBottom": "15px"}),
+
+    html.Label("Select Major",
+               style={"fontWeight": "bold"}),
+
     dcc.Dropdown(
         id="major-dropdown",
         options=[{"label": m, "value": m} for m in df["Major"].unique()],
         value=df["Major"].unique()[0],
-        clearable=False
+        clearable=False,
+        style={"marginBottom": "20px"}
     ),
+
+    html.Label("Select GPA Range",
+               style={"fontWeight": "bold"}),
 
     dcc.RangeSlider(
         id="gpa-slider",
@@ -70,6 +82,13 @@ app.layout = html.Div([
         value=[df["GPA"].min(), df["GPA"].max()],
         marks={round(g, 1): str(round(g, 1)) for g in sorted(df["GPA"].unique())}
     ),
+
+], style={
+    "backgroundColor": "#1e293b",
+    "padding": "25px",
+    "borderRadius": "12px",
+    "marginTop": "20px"
+}),
 
     # ---------------------------
     # Buttons
