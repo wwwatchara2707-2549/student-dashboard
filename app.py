@@ -9,6 +9,8 @@ Features:
 - 4 Interactive Graphs (Bar, Line, Pie, Scatter)
 - KPI summary cards
 - Interactive DataTable
+- Reset & Download functionality
+- Dark Theme
 
 Author: Your Name
 """
@@ -49,45 +51,51 @@ app.layout = html.Div([
         value=[df["GPA"].min(), df["GPA"].max()],
         marks={round(g, 1): str(round(g, 1)) for g in sorted(df["GPA"].unique())}
     ),
-    
-    # Reset Button
-    html.Button(
-        "Reset Filters",
-        id="reset-button",
-        n_clicks=0,
-        style={
-            "marginTop": "15px",
-            "padding": "10px 20px",
-            "backgroundColor": "#ff4d4f",
-            "color": "white",
-            "border": "none",
-            "cursor": "pointer"
-        }
-    ),
-    
-    # Download Button
-html.Button(
-    "Download Filtered Data",
-    id="download-button",
-    n_clicks=0,
-    style={
-        "marginTop": "10px",
-        "marginLeft": "10px",
-        "padding": "10px 20px",
-        "backgroundColor": "#1890ff",
-        "color": "white",
-        "border": "none",
-        "cursor": "pointer"
-    }
-),
 
-dcc.Download(id="download-data"),
+    # Buttons
+    html.Div([
+        html.Button(
+            "Reset Filters",
+            id="reset-button",
+            n_clicks=0,
+            style={
+                "padding": "10px 20px",
+                "backgroundColor": "#ff4d4f",
+                "color": "white",
+                "border": "none",
+                "cursor": "pointer"
+            }
+        ),
+        html.Button(
+            "Download Filtered Data",
+            id="download-button",
+            n_clicks=0,
+            style={
+                "padding": "10px 20px",
+                "backgroundColor": "#1890ff",
+                "color": "white",
+                "border": "none",
+                "cursor": "pointer",
+                "marginLeft": "10px"
+            }
+        ),
+        dcc.Download(id="download-data"),
+    ], style={"marginTop": "15px"}),
 
     # KPI Cards
     html.Div([
-        html.Div(id="total-students", className="card"),
-        html.Div(id="avg-gpa", className="card"),
-        html.Div(id="max-gpa", className="card"),
+        html.Div(id="total-students",
+                 style={"backgroundColor": "#1f1f1f",
+                        "padding": "15px",
+                        "borderRadius": "8px"}),
+        html.Div(id="avg-gpa",
+                 style={"backgroundColor": "#1f1f1f",
+                        "padding": "15px",
+                        "borderRadius": "8px"}),
+        html.Div(id="max-gpa",
+                 style={"backgroundColor": "#1f1f1f",
+                        "padding": "15px",
+                        "borderRadius": "8px"}),
     ], style={"display": "flex", "gap": "20px", "marginTop": "20px"}),
 
     # Graphs
@@ -112,7 +120,13 @@ dcc.Download(id="download-data"),
         }
     )
 
-], style={"margin": "40px"})
+], style={
+    "margin": "40px",
+    "backgroundColor": "#111111",
+    "color": "white",
+    "minHeight": "100vh"
+})
+
 
 # Main Callback
 @app.callback(
@@ -135,14 +149,10 @@ def update_graphs(selected_major, gpa_range):
         (df["GPA"] <= gpa_range[1])
     ]
 
-    # Bar chart
     fig1 = px.bar(filtered_df, x="Name", y="Math", title="Math Scores")
-
-    # Line chart
     fig2 = px.line(filtered_df, x="Age", y="GPA",
                    title="GPA by Age", markers=True)
 
-    # Pie chart
     pie_df = df[
         (df["GPA"] >= gpa_range[0]) &
         (df["GPA"] <= gpa_range[1])
@@ -150,13 +160,17 @@ def update_graphs(selected_major, gpa_range):
     fig3 = px.pie(pie_df, names="Major",
                   title="Major Distribution")
 
-    # Scatter plot
     fig4 = px.scatter(filtered_df, x="Math", y="GPA",
                       size="Age",
                       title="Math vs GPA (size = Age)",
                       hover_data=["Name"])
 
-    # KPI values
+    # Apply Dark Theme to charts
+    fig1.update_layout(template="plotly_dark")
+    fig2.update_layout(template="plotly_dark")
+    fig3.update_layout(template="plotly_dark")
+    fig4.update_layout(template="plotly_dark")
+
     total_students = f"👨‍🎓 Total Students: {len(filtered_df)}"
     avg_gpa = f"📊 Average GPA: {round(filtered_df['GPA'].mean(), 2) if not filtered_df.empty else 0}"
     max_gpa = f"🏆 Highest GPA: {filtered_df['GPA'].max() if not filtered_df.empty else 0}"
@@ -166,7 +180,7 @@ def update_graphs(selected_major, gpa_range):
     return fig1, fig2, fig3, fig4, total_students, avg_gpa, max_gpa, table_data
 
 
-# Reset Callback (ต้องอยู่แยก และมี def ต่อทันที)
+# Reset Callback
 @app.callback(
     Output("major-dropdown", "value"),
     Output("gpa-slider", "value"),
@@ -176,6 +190,8 @@ def update_graphs(selected_major, gpa_range):
 def reset_filters(n_clicks):
     return df["Major"].unique()[0], [df["GPA"].min(), df["GPA"].max()]
 
+
+# Download Callback
 @app.callback(
     Output("download-data", "data"),
     Input("download-button", "n_clicks"),
@@ -196,6 +212,7 @@ def download_filtered_data(n_clicks, selected_major, gpa_range):
         "filtered_students.csv",
         index=False
     )
+
 
 if __name__ == '__main__':
     app.run(debug=True)
