@@ -241,7 +241,13 @@ def update_graphs(selected_major, gpa_range):
     prevent_initial_call=True
 )
 def reset_filters(n):
-    return df["Major"].unique()[0], [df["GPA"].min(), df["GPA"].max()]
+    if df.empty:
+        return dash.no_update, dash.no_update
+
+    return (
+        df["Major"].unique()[0],
+        [df["GPA"].min(), df["GPA"].max()]
+    )
 
 # ===============================
 # Download Callback
@@ -254,10 +260,20 @@ def reset_filters(n):
     prevent_initial_call=True
 )
 def download_filtered_data(n, major, gpa_range):
+    
+    if not n:
+        return dash.no_update
+
     filtered_df = filter_data(major, gpa_range)
-    return dcc.send_data_frame(filtered_df.to_csv,
-                               "filtered_students.csv",
-                               index=False)
+
+    if filtered_df.empty:
+        return dash.no_update
+
+    return dcc.send_data_frame(
+        filtered_df.to_csv,
+        "filtered_students.csv",
+        index=False
+    )
 
 # ===============================
 # Run App
