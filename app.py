@@ -144,12 +144,25 @@ app.layout = html.Div([
     }),
 
     # ---------------------------
-    # Graphs
-    # ---------------------------
-    dcc.Graph(id="bar-chart", style={"marginTop": "30px"}),
-    dcc.Graph(id="line-chart"),
-    dcc.Graph(id="pie-chart"),
-    dcc.Graph(id="scatter-chart"),
+# Graphs (2x2 Grid Layout)
+# ---------------------------
+html.Div([
+    html.Div(dcc.Graph(id="bar-chart"), style={"flex": "1"}),
+    html.Div(dcc.Graph(id="line-chart"), style={"flex": "1"}),
+], style={
+    "display": "flex",
+    "gap": "20px",
+    "marginTop": "30px"
+}),
+
+html.Div([
+    html.Div(dcc.Graph(id="pie-chart"), style={"flex": "1"}),
+    html.Div(dcc.Graph(id="scatter-chart"), style={"flex": "1"}),
+], style={
+    "display": "flex",
+    "gap": "20px",
+    "marginTop": "20px"
+}),
 
     # ---------------------------
     # Data Table
