@@ -64,6 +64,24 @@ app.layout = html.Div([
             "cursor": "pointer"
         }
     ),
+    
+    # Download Button
+html.Button(
+    "Download Filtered Data",
+    id="download-button",
+    n_clicks=0,
+    style={
+        "marginTop": "10px",
+        "marginLeft": "10px",
+        "padding": "10px 20px",
+        "backgroundColor": "#1890ff",
+        "color": "white",
+        "border": "none",
+        "cursor": "pointer"
+    }
+),
+
+dcc.Download(id="download-data"),
 
     # KPI Cards
     html.Div([
@@ -157,6 +175,27 @@ def update_graphs(selected_major, gpa_range):
 )
 def reset_filters(n_clicks):
     return df["Major"].unique()[0], [df["GPA"].min(), df["GPA"].max()]
+
+@app.callback(
+    Output("download-data", "data"),
+    Input("download-button", "n_clicks"),
+    Input("major-dropdown", "value"),
+    Input("gpa-slider", "value"),
+    prevent_initial_call=True
+)
+def download_filtered_data(n_clicks, selected_major, gpa_range):
+
+    filtered_df = df[
+        (df["Major"] == selected_major) &
+        (df["GPA"] >= gpa_range[0]) &
+        (df["GPA"] <= gpa_range[1])
+    ]
+
+    return dcc.send_data_frame(
+        filtered_df.to_csv,
+        "filtered_students.csv",
+        index=False
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
