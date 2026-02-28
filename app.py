@@ -1,3 +1,16 @@
+"""
+Student Performance Dashboard
+------------------------------
+This dashboard is built using Dash and Plotly.
+
+Features:
+- Dropdown to filter by Major
+- RangeSlider to filter by GPA
+- 3 Interactive Graphs (Bar, Line, Pie)
+- KPI summary cards (Total Students, Avg GPA, Max GPA)
+
+Author: Your Name
+"""
 # Import required libraries
 import dash
 from dash import html, dcc
@@ -17,7 +30,7 @@ app.layout = html.Div([
     html.H1("Student Performance Dashboard",
             style={"textAlign": "center"}),
 
-    # Dropdown for Major selection
+    # Dropdown
     dcc.Dropdown(
         id="major-dropdown",
         options=[{"label": m, "value": m} for m in df["Major"].unique()],
@@ -25,42 +38,51 @@ app.layout = html.Div([
         clearable=False
     ),
 
-    # GPA Range Slider
+    # GPA Slider
     dcc.RangeSlider(
         id="gpa-slider",
         min=df["GPA"].min(),
         max=df["GPA"].max(),
         step=0.1,
         value=[df["GPA"].min(), df["GPA"].max()],
-        marks={round(g,1): str(round(g,1)) for g in df["GPA"].unique()}
+        marks={round(g,1): str(round(g,1)) for g in sorted(df["GPA"].unique())}
     ),
 
+    # KPI Cards
     html.Div([
-        dcc.Graph(id="bar-chart"),
-        dcc.Graph(id="line-chart"),
-    ], style={"display": "flex", "gap": "20px"}),
+        html.Div(id="total-students", className="card"),
+        html.Div(id="avg-gpa", className="card"),
+        html.Div(id="max-gpa", className="card"),
+    ], style={"display": "flex", "gap": "20px", "marginTop": "20px"}),
 
+    # Graphs
+    dcc.Graph(id="bar-chart"),
+    dcc.Graph(id="line-chart"),
     dcc.Graph(id="pie-chart")
 
 ], style={"margin": "40px"})
 
 
-# Callback for interactivity
+# Callback
 @app.callback(
     Output("bar-chart", "figure"),
     Output("line-chart", "figure"),
     Output("pie-chart", "figure"),
+    Output("total-students", "children"),
+    Output("avg-gpa", "children"),
+    Output("max-gpa", "children"),
     Input("major-dropdown", "value"),
     Input("gpa-slider", "value")
 )
 def update_graphs(selected_major, gpa_range):
-    
+
     filtered_df = df[
         (df["Major"] == selected_major) &
         (df["GPA"] >= gpa_range[0]) &
         (df["GPA"] <= gpa_range[1])
     ]
 
+    # Bar chart
     fig1 = px.bar(
         filtered_df,
         x="Name",
@@ -68,6 +90,7 @@ def update_graphs(selected_major, gpa_range):
         title="Math Scores"
     )
 
+    # Line chart
     fig2 = px.line(
         filtered_df,
         x="Age",
@@ -76,7 +99,7 @@ def update_graphs(selected_major, gpa_range):
         markers=True
     )
 
-    # FIXED PART
+    # Pie chart (all majors in GPA range)
     pie_df = df[
         (df["GPA"] >= gpa_range[0]) &
         (df["GPA"] <= gpa_range[1])
@@ -88,7 +111,17 @@ def update_graphs(selected_major, gpa_range):
         title="Major Distribution"
     )
 
-    return fig1, fig2, fig3
+    # KPI values
+    total_students = f"👨‍🎓 Total Students: {len(filtered_df)}"
+    avg_gpa = f"📊 Average GPA: {round(filtered_df['GPA'].mean(),2) if not filtered_df.empty else 0}"
+    max_gpa = f"🏆 Highest GPA: {filtered_df['GPA'].max() if not filtered_df.empty else 0}"
+
+    return fig1, fig2, fig3, total_students, avg_gpa, max_gpa
+
+dcc.Graph(id="bar-chart", style={"marginTop": "30px"}),
+dcc.Graph(id="line-chart"),
+dcc.Graph(id="pie-chart")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
