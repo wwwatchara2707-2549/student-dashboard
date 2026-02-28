@@ -91,20 +91,46 @@ app.layout = html.Div([
     ], style={"marginTop": "15px"}),
 
     # KPI Cards
-    html.Div([
-        html.Div(id="total-students",
-                 style={"backgroundColor": "#1f1f1f",
-                        "padding": "15px",
-                        "borderRadius": "8px"}),
-        html.Div(id="avg-gpa",
-                 style={"backgroundColor": "#1f1f1f",
-                        "padding": "15px",
-                        "borderRadius": "8px"}),
-        html.Div(id="max-gpa",
-                 style={"backgroundColor": "#1f1f1f",
-                        "padding": "15px",
-                        "borderRadius": "8px"}),
-    ], style={"display": "flex", "gap": "20px", "marginTop": "20px"}),
+    # KPI Cards
+html.Div([
+    html.Div(id="total-students",
+             style={
+                 "backgroundColor": "#1f1f1f",
+                 "padding": "20px",
+                 "borderRadius": "10px",
+                 "color": "white",
+                 "fontSize": "20px",
+                 "fontWeight": "bold",
+                 "textAlign": "center",
+                 "flex": "1"
+             }),
+    html.Div(id="avg-gpa",
+             style={
+                 "backgroundColor": "#1f1f1f",
+                 "padding": "20px",
+                 "borderRadius": "10px",
+                 "color": "white",
+                 "fontSize": "20px",
+                 "fontWeight": "bold",
+                 "textAlign": "center",
+                 "flex": "1"
+             }),
+    html.Div(id="max-gpa",
+             style={
+                 "backgroundColor": "#1f1f1f",
+                 "padding": "20px",
+                 "borderRadius": "10px",
+                 "color": "white",
+                 "fontSize": "20px",
+                 "fontWeight": "bold",
+                 "textAlign": "center",
+                 "flex": "1"
+             }),
+], style={
+    "display": "flex",
+    "gap": "20px",
+    "marginTop": "30px"
+})
 
     # Graphs
     dcc.Graph(id="bar-chart", style={"marginTop": "30px"}),
