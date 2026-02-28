@@ -15,17 +15,23 @@ Features:
 Author: Your Name
 """
 
-# Import required libraries
+# ===============================
+# Import Libraries
+# ===============================
 import dash
 from dash import html, dcc, dash_table
 from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.express as px
 
-# Load dataset
+# ===============================
+# Load Dataset
+# ===============================
 df = pd.read_csv("data.csv")
 
-# Helper function to filter dataframe
+# ===============================
+# Helper Function
+# ===============================
 def filter_data(selected_major, gpa_range):
     return df[
         (df["Major"] == selected_major) &
@@ -33,16 +39,22 @@ def filter_data(selected_major, gpa_range):
         (df["GPA"] <= gpa_range[1])
     ]
 
-# Initialize Dash app
+# ===============================
+# Initialize App
+# ===============================
 app = dash.Dash(__name__)
 
+# ===============================
 # Layout
+# ===============================
 app.layout = html.Div([
 
-    html.H1("Student Performance Dashboard",
+    html.H1("🎓 Student Performance Dashboard",
             style={"textAlign": "center"}),
 
-    # Dropdown
+    # ---------------------------
+    # Filters
+    # ---------------------------
     dcc.Dropdown(
         id="major-dropdown",
         options=[{"label": m, "value": m} for m in df["Major"].unique()],
@@ -50,7 +62,6 @@ app.layout = html.Div([
         clearable=False
     ),
 
-    # GPA Slider
     dcc.RangeSlider(
         id="gpa-slider",
         min=df["GPA"].min(),
@@ -60,7 +71,9 @@ app.layout = html.Div([
         marks={round(g, 1): str(round(g, 1)) for g in sorted(df["GPA"].unique())}
     ),
 
+    # ---------------------------
     # Buttons
+    # ---------------------------
     html.Div([
         html.Button(
             "Reset Filters",
@@ -90,79 +103,85 @@ app.layout = html.Div([
         dcc.Download(id="download-data"),
     ], style={"marginTop": "15px"}),
 
+    # ---------------------------
     # KPI Cards
-    # KPI Cards
-html.Div([
-    html.Div(id="total-students",
-             style={
-                 "backgroundColor": "#1f1f1f",
-                 "padding": "20px",
-                 "borderRadius": "10px",
-                 "color": "white",
-                 "fontSize": "20px",
-                 "fontWeight": "bold",
-                 "textAlign": "center",
-                 "flex": "1"
-             }),
-    html.Div(id="avg-gpa",
-             style={
-                 "backgroundColor": "#1f1f1f",
-                 "padding": "20px",
-                 "borderRadius": "10px",
-                 "color": "white",
-                 "fontSize": "20px",
-                 "fontWeight": "bold",
-                 "textAlign": "center",
-                 "flex": "1"
-             }),
-    html.Div(id="max-gpa",
-             style={
-                 "backgroundColor": "#1f1f1f",
-                 "padding": "20px",
-                 "borderRadius": "10px",
-                 "color": "white",
-                 "fontSize": "20px",
-                 "fontWeight": "bold",
-                 "textAlign": "center",
-                 "flex": "1"
-             }),
-], style={
-    "display": "flex",
-    "gap": "20px",
-    "marginTop": "30px"
-})
+    # ---------------------------
+    html.Div([
+        html.Div(id="total-students", style={
+            "backgroundColor": "#1e293b",
+            "padding": "20px",
+            "borderRadius": "12px",
+            "color": "white",
+            "fontSize": "20px",
+            "fontWeight": "bold",
+            "textAlign": "center",
+            "flex": "1"
+        }),
+        html.Div(id="avg-gpa", style={
+            "backgroundColor": "#1e293b",
+            "padding": "20px",
+            "borderRadius": "12px",
+            "color": "white",
+            "fontSize": "20px",
+            "fontWeight": "bold",
+            "textAlign": "center",
+            "flex": "1"
+        }),
+        html.Div(id="max-gpa", style={
+            "backgroundColor": "#1e293b",
+            "padding": "20px",
+            "borderRadius": "12px",
+            "color": "white",
+            "fontSize": "20px",
+            "fontWeight": "bold",
+            "textAlign": "center",
+            "flex": "1"
+        }),
+    ], style={
+        "display": "flex",
+        "gap": "20px",
+        "marginTop": "30px"
+    }),
 
+    # ---------------------------
     # Graphs
+    # ---------------------------
     dcc.Graph(id="bar-chart", style={"marginTop": "30px"}),
     dcc.Graph(id="line-chart"),
     dcc.Graph(id="pie-chart"),
     dcc.Graph(id="scatter-chart"),
 
+    # ---------------------------
     # Data Table
+    # ---------------------------
     dash_table.DataTable(
         id="student-table",
         columns=[{"name": col, "id": col} for col in df.columns],
         page_size=10,
         style_table={"overflowX": "auto"},
         style_header={
-            "backgroundColor": "#1f2c56",
+            "backgroundColor": "#1e293b",
             "color": "white",
             "fontWeight": "bold"
         },
         style_cell={
+            "backgroundColor": "#1f2937",
+            "color": "white",
             "textAlign": "center"
         }
     )
 
 ], style={
     "margin": "40px",
-    "backgroundColor": "#111111",
+    "backgroundColor": "#0f172a",
     "color": "white",
-    "minHeight": "100vh"
+    "minHeight": "100vh",
+    "fontFamily": "Arial"
 })
 
-
+# ===============================
 # Main Callback
+# ===============================
 @app.callback(
     Output("bar-chart", "figure"),
     Output("line-chart", "figure"),
@@ -178,6 +197,9 @@ html.Div([
 def update_graphs(selected_major, gpa_range):
 
     filtered_df = filter_data(selected_major, gpa_range)
+
+    if filtered_df.empty:
+        filtered_df = pd.DataFrame(columns=df.columns)
 
     fig1 = px.bar(filtered_df, x="Name", y="Math", title="Math Scores")
     fig2 = px.line(filtered_df, x="Age", y="GPA",
@@ -195,11 +217,9 @@ def update_graphs(selected_major, gpa_range):
                       title="Math vs GPA (size = Age)",
                       hover_data=["Name"])
 
-    # Apply Dark Theme to charts
-    fig1.update_layout(template="plotly_dark")
-    fig2.update_layout(template="plotly_dark")
-    fig3.update_layout(template="plotly_dark")
-    fig4.update_layout(template="plotly_dark")
+    # Dark theme
+    for fig in [fig1, fig2, fig3, fig4]:
+        fig.update_layout(template="plotly_dark")
 
     total_students = f"👨‍🎓 Total Students: {len(filtered_df)}"
     avg_gpa = f"📊 Average GPA: {round(filtered_df['GPA'].mean(), 2) if not filtered_df.empty else 0}"
@@ -209,8 +229,9 @@ def update_graphs(selected_major, gpa_range):
 
     return fig1, fig2, fig3, fig4, total_students, avg_gpa, max_gpa, table_data
 
-
+# ===============================
 # Reset Callback
+# ===============================
 @app.callback(
     Output("major-dropdown", "value"),
     Output("gpa-slider", "value"),
@@ -220,8 +241,9 @@ def update_graphs(selected_major, gpa_range):
 def reset_filters(n_clicks):
     return df["Major"].unique()[0], [df["GPA"].min(), df["GPA"].max()]
 
-
+# ===============================
 # Download Callback
+# ===============================
 @app.callback(
     Output("download-data", "data"),
     Input("download-button", "n_clicks"),
@@ -239,6 +261,8 @@ def download_filtered_data(n_clicks, selected_major, gpa_range):
         index=False
     )
 
-
+# ===============================
+# Run App
+# ===============================
 if __name__ == '__main__':
     app.run(debug=True)
