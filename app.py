@@ -97,7 +97,8 @@ app.layout = html.Div([
     # Graphs
     dcc.Graph(id="bar-chart", style={"marginTop": "30px"}),
     dcc.Graph(id="line-chart"),
-    dcc.Graph(id="pie-chart")
+    dcc.Graph(id="pie-chart"),
+    dcc.Graph(id="scatter-chart"),
 
 ], style={"margin": "40px"})
 
@@ -107,6 +108,7 @@ app.layout = html.Div([
     Output("bar-chart", "figure"),
     Output("line-chart", "figure"),
     Output("pie-chart", "figure"),
+    Output("scatter-chart", "figure"),   # เพิ่ม
     Output("total-students", "children"),
     Output("avg-gpa", "children"),
     Output("max-gpa", "children"),
@@ -115,7 +117,6 @@ app.layout = html.Div([
 )
 def update_graphs(selected_major, gpa_range):
 
-    # Filter dataset by selected major and GPA range
     filtered_df = df[
         (df["Major"] == selected_major) &
         (df["GPA"] >= gpa_range[0]) &
@@ -139,7 +140,7 @@ def update_graphs(selected_major, gpa_range):
         markers=True
     )
 
-    # Pie chart (all majors within selected GPA range)
+    # Pie chart (all majors in GPA range)
     pie_df = df[
         (df["GPA"] >= gpa_range[0]) &
         (df["GPA"] <= gpa_range[1])
@@ -151,12 +152,22 @@ def update_graphs(selected_major, gpa_range):
         title="Major Distribution"
     )
 
+    # Scatter plot (NEW)
+    fig4 = px.scatter(
+        filtered_df,
+        x="Math",
+        y="GPA",
+        size="Age",
+        title="Math vs GPA (size = Age)",
+        hover_data=["Name"]
+    )
+
     # KPI values
     total_students = f"👨‍🎓 Total Students: {len(filtered_df)}"
     avg_gpa = f"📊 Average GPA: {round(filtered_df['GPA'].mean(),2) if not filtered_df.empty else 0}"
     max_gpa = f"🏆 Highest GPA: {filtered_df['GPA'].max() if not filtered_df.empty else 0}"
 
-    return fig1, fig2, fig3, total_students, avg_gpa, max_gpa
+    return fig1, fig2, fig3, fig4, total_students, avg_gpa, max_gpa
 
 
 if __name__ == '__main__':
